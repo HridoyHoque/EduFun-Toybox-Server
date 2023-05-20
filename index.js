@@ -30,11 +30,24 @@ async function run() {
 
     const toyCollection = client.db('toyDB').collection('toy')
 
+    // Filter data by email for My Toys
+    app.get('/toys', async(req, res) => {
+      let query = {};
+      if(req.query?.email){
+        query = { email: req.query.email}
+      }
+      const result = await toyCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // get All Inserted data 
     app.get('/toys', async (req, res) => {
       const cursor = toyCollection.find();
       const result = await cursor.toArray()
       res.send(result)
     })
+
+    // Insert Data
     app.post('/toys', async (req, res) => {
       const newToy = req.body;
       console.log(newToy);
