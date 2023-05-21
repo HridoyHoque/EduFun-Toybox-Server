@@ -31,10 +31,10 @@ async function run() {
     const toyCollection = client.db('toyDB').collection('toy')
 
     // Filter data by email for My Toys
-    app.get('/toys', async(req, res) => {
+    app.get('/toys', async (req, res) => {
       let query = {};
-      if(req.query?.email){
-        query = { email: req.query.email}
+      if (req.query?.email) {
+        query = { email: req.query.email }
       }
       const result = await toyCollection.find(query).toArray();
       res.send(result);
@@ -50,7 +50,7 @@ async function run() {
     // findOne data to update Toy information
     app.get('/toys/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await toyCollection.findOne(query);
       res.send(result)
     })
@@ -63,10 +63,29 @@ async function run() {
       res.send(result);
     })
 
+    // Update a Single Toy
+    app.put('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedToy = req.body;
+      const toy = {
+        $set: {
+          name: updatedToy.name,
+          price: updatedToy.price,
+          photo: updatedToy.photo,
+          details: updatedToy.details,
+          quantity: updatedToy.quantity
+        }
+      }
+      const result = await toyCollection.updateOne(filter, toy, options)
+      res.send(result);
+    })
+
     // delete My Toys Data 
     app.delete('/toys/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await toyCollection.deleteOne(query);
       res.send(result);
     })
@@ -82,9 +101,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send("Toys Are Coming soon")
+  res.send("Toys Are Coming soon")
 });
 
 app.listen(port, () => {
-    console.log(`Toy store are running on port, ${port}`)
+  console.log(`Toy store are running on port, ${port}`)
 });
