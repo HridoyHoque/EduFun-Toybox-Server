@@ -47,6 +47,14 @@ async function run() {
       res.send(result)
     })
 
+    // findOne data to update Toy information
+    app.get('/toys/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await toyCollection.findOne(query);
+      res.send(result)
+    })
+
     // Insert Data
     app.post('/toys', async (req, res) => {
       const newToy = req.body;
@@ -62,7 +70,7 @@ async function run() {
       const result = await toyCollection.deleteOne(query);
       res.send(result);
     })
-    
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
