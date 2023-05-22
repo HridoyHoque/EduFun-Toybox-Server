@@ -41,23 +41,24 @@ async function run() {
       res.send(result);
     })
 
-  // filter data by search text
 
-  const indexKeys = {name: 1}
-  const indexOptions = { name: 'ToysName'}
+    // set indexKey for named queries
+    const indexKeys = { name: 1 }
+    const indexOptions = { name: 'ToysName' }
+    const result = await toyCollection.createIndex(indexKeys, indexOptions);
+    console.log(result)
 
-  const result = await toyCollection.createIndex(indexKeys, indexOptions)
+    // filter data for search text
+    app.get('/toySearchByName/:text', async (req, res) => {
+      const searchText = req.params.text;
+      const result = await toyCollection.find({
+        $or: [
+          { name: { $regex: searchText, $options: "i" } }
+        ]
+      }).toArray();
+      res.send(result);
+    })
 
-   app.get('/toySearchByName/:text', async(req, res) => {
-    const searchText = req.params.text;
-
-    const result = await toyCollection.find({
-      $or : [
-        {name: {$regex: searchText, $options: "i"}}
-      ]
-    }).toArray();
-    res.send(result);
-   })
     // get All Inserted data 
     app.get('/toys', async (req, res) => {
       const cursor = toyCollection.find();
@@ -73,12 +74,12 @@ async function run() {
       res.send(result)
     })
 
-    // filter data for sub category
-  app.get('/category/:text', async(req, res) => {
-    const result = await categoryCollection.find({category:req.params.text})
-    res.send(result)
-  })
-    
+    // get all Shop By Category data 
+    app.get('/category/:text', async (req, res) => {
+      const result = await categoryCollection.find({ category: req.params.text }).toArray();
+      res.send(result);
+    })
+
 
     // Insert Data
     app.post('/toys', async (req, res) => {
