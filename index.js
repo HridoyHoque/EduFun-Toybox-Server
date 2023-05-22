@@ -29,6 +29,7 @@ async function run() {
     await client.connect();
 
     const toyCollection = client.db('toyDB').collection('toy')
+    const categoryCollection = client.db('CatgegoryDB').collection('ToyCategoryDB')
 
     // Filter data by email for My Toys
     app.get('/toys', async (req, res) => {
@@ -40,6 +41,23 @@ async function run() {
       res.send(result);
     })
 
+  // filter data by search text
+
+  const indexKeys = {name: 1}
+  const indexOptions = { name: 'ToysName'}
+
+  const result = await toyCollection.createIndex(indexKeys, indexOptions)
+
+   app.get('/toySearchByName/:text', async(req, res) => {
+    const searchText = req.params.text;
+
+    const result = await toyCollection.find({
+      $or : [
+        {name: {$regex: searchText, $options: "i"}}
+      ]
+    }).toArray();
+    res.send(result);
+   })
     // get All Inserted data 
     app.get('/toys', async (req, res) => {
       const cursor = toyCollection.find();
@@ -54,6 +72,13 @@ async function run() {
       const result = await toyCollection.findOne(query);
       res.send(result)
     })
+
+    // filter data for sub category
+  app.get('/category/:text', async(req, res) => {
+    const result = await categoryCollection.find({category:req.params.text})
+    res.send(result)
+  })
+    
 
     // Insert Data
     app.post('/toys', async (req, res) => {
