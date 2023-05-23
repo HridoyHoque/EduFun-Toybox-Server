@@ -31,13 +31,14 @@ async function run() {
     const toyCollection = client.db('toyDB').collection('toy')
     const categoryCollection = client.db('CatgegoryDB').collection('ToyCategoryDB')
 
-    // Filter data by email for My Toys
+    // Filter data by email and sort by price ascending and descending
     app.get('/toys', async (req, res) => {
+      const sortOptions = req.query.sort === 'descending' ? -1 : 1;
       let query = {};
       if (req.query?.email) {
         query = { email: req.query.email }
       }
-      const result = await toyCollection.find(query).toArray();
+      const result = await toyCollection.find(query).sort({price : sortOptions}).toArray();
       res.send(result);
     })
 
@@ -55,16 +56,16 @@ async function run() {
         $or: [
           { name: { $regex: searchText, $options: "i" } }
         ]
-      }).toArray();
+      }).limit(20).toArray();
       res.send(result);
     })
 
     // get All Inserted data 
     app.get('/toys', async (req, res) => {
-      const cursor = toyCollection.find();
-      const result = await cursor.toArray()
-      res.send(result)
-    })
+      const cursor = toyCollection.find().limit(20);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     // findOne data to update Toy information
     app.get('/toys/:id', async (req, res) => {
