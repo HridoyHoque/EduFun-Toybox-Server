@@ -26,10 +26,16 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await
+     client.connect();
 
     const toyCollection = client.db('toyDB').collection('toy')
     const categoryCollection = client.db('CatgegoryDB').collection('ToyCategoryDB')
+
+
+    app.get('/', (req, res) => {
+      res.send("Toys Are Coming soon")
+    });
 
     // Filter data by email and sort by price ascending and descending
     app.get('/toys', async (req, res) => {
@@ -96,7 +102,6 @@ async function run() {
     })
 
 
-
     // Insert Data
     app.post('/toys', async (req, res) => {
       const newToy = req.body;
@@ -141,10 +146,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
-app.get('/', (req, res) => {
-  res.send("Toys Are Coming soon")
-});
 
 app.listen(port, () => {
   console.log(`Toy store are running on port, ${port}`)
