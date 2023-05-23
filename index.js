@@ -38,7 +38,7 @@ async function run() {
       if (req.query?.email) {
         query = { email: req.query.email }
       }
-      const result = await toyCollection.find(query).sort({price : sortOptions}).toArray();
+      const result = await toyCollection.find(query).sort({ price: sortOptions }).toArray();
       res.send(result);
     })
 
@@ -75,11 +75,26 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/category', async (req, res) => {
+      const cursor = categoryCollection.find()
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    // get One shop by category data
+    app.get('/singleToyCategory/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await categoryCollection.findOne(query);
+      res.send(result);
+    })
+
     // get all Shop By Category data 
     app.get('/category/:text', async (req, res) => {
       const result = await categoryCollection.find({ category: req.params.text }).toArray();
       res.send(result);
     })
+
 
 
     // Insert Data
